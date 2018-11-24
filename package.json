@@ -1,0 +1,32 @@
+{
+  "name": "youtube-client",
+  "version": "1.0.0",
+  "description": "youtube-client",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint search.js"
+  },
+  "eslintConfig": {
+    "globals": {
+      "window": true,
+      "document": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rolling-scopes-school/maksimaliakhnovich-2018Q3.git"
+  },
+  "author": "Maksim Aliakhnovich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rolling-scopes-school/maksimaliakhnovich-2018Q3/issues"
+  },
+  "homepage": "https://github.com/rolling-scopes-school/maksimaliakhnovich-2018Q3#readme",
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  }
+}
