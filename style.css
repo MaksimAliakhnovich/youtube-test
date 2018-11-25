@@ -11,8 +11,66 @@ body {
   box-sizing: border-box;
 }
 
-/* == SEARCH FORM == */
+/* == PAGINATION == */
+.pagination {
+  width: 170px;
+  margin: 3em auto;
+}
 
+.pagination div {
+  float: left;
+  margin: 0 4px;
+  padding: 8px 16px;
+  color: black;
+  background-color: #ffffff;
+  text-decoration: none;
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  transition: 0.3s;
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.25);
+}
+
+.pagination .prev,
+.pagination .next {
+  cursor: pointer;
+}
+
+.pagination .prev:hover,
+.pagination .next:hover {
+  background-color: #cc181e;
+  color: white;
+  border: 1px solid #cc181e;
+}
+
+/* == TOOLTIP == */
+.tooltip {
+  position: absolute;
+  padding: 8px;
+  min-width: 30px;
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 1.5em;
+  text-align: center;
+  user-select: none;
+  opacity: 0;
+  transform: translate(-50%, -140%);
+  transition: opacity 0.5s;
+}
+
+.tooltip ::after {
+  content: "";
+  position: absolute;
+  top: 98%;
+  left: 50%;
+  margin-left: -8px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+/* == SEARCH FORM == */
 .search-form {
   position: relative;
   width: 60%;
@@ -70,10 +128,6 @@ body {
   transition: 0.5s;
 }
 
-.main figure {
-  margin: 0;
-}
-
 .main figcaption {
   margin: auto 20px;
   height: 20px;
@@ -81,8 +135,30 @@ body {
   text-align: center;
 }
 
+.main figure {
+  margin: 0;
+}
+
 .main figure img {
   width: 100%;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+}
+
+.main figure div {
+  position: relative;
+  margin: 0 25px 0 50px;
+  padding: 0.5em 0;
+}
+
+.main figure div::before {
+  position: absolute;
+  left: -35px;
+  top: 5px;
+  font-family: "Font Awesome\ 5 Free";
+  color: #000000;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .main .video {
@@ -108,22 +184,6 @@ body {
   max-height: 100px;
   overflow: auto;
   word-break: break-all;
-}
-
-.main figure div {
-  position: relative;
-  margin: 0 25px 0 50px;
-  padding: 0.5em 0;
-}
-
-.main figure div::before {
-  position: absolute;
-  left: -35px;
-  top: 5px;
-  font-family: "Font Awesome\ 5 Free";
-  color: #000000;
-  font-size: 20px;
-  font-weight: bold;
 }
 
 .main .author::before {
@@ -154,40 +214,50 @@ body {
   opacity: 0;
 }
 
-.main .-visible {
-  opacity: 1;
+.-visible {
+  visibility: visible;
+  opacity: 0.8;
 }
 
 /* == MEDIA == */
 
 @media screen and (max-width: 1366px) {
   .header {
-    margin-top: 5em;
+    margin-top: 3em;
   }
 
   .main .video-list {
     grid-template-columns: repeat(3, minmax(200px, 350px));
+    margin: 3em 2em 0;
   }
 }
 
 @media screen and (max-width: 960px) {
   .header {
-    margin-top: 2em;
+    margin-top: 1em;
   }
 
   .main .video-list {
-    grid-template-columns: repeat(2, minmax(200px, 350px));
-    margin: 2em 2em 0;
+    grid-template-columns: repeat(2, minmax(200px, 330px));
+    margin: 1em 2em 0;
+  }
+
+  .pagination {
+    margin: 1.5em auto;
   }
 }
 
 @media screen and (max-width: 600px) {
   .header {
-    margin-top: 5em;
+    margin-top: 3em;
   }
 
   .main .video-list {
     grid-template-columns: repeat(1, minmax(200px, 350px));
-    margin: 5em 2em 0;
+    margin: 3em 2em 0;
+  }
+
+  .pagination {
+    margin: 2em auto;
   }
 }

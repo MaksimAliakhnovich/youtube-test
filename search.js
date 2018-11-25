@@ -3,12 +3,14 @@ const youtubeLinkWithoutId = 'https://www.youtube.com/watch?v=';
 const videoInYoutubeResponse = 15;
 const resolutions = [1920, 1366, 960, 600, 0];
 const videoOnPageVariants = [4, 3, 2, 1];
-const bufferPagesIndex = 3;
+const bufferPreloadPagesIndex = 3;
 const minLengthForSwipe = 100;
+const timeSwipeAnimation = 500;
 const listVideo = [];
 const listVideoViewRate = {};
 let currentAmountVideoOnPage = 1;
 let offsetPage = 0;
+let numberCurrentPage = 1;
 let nextYoutubePageToken = null;
 const body = document.querySelector('body');
 const createDiv = () => document.createElement('div');
@@ -19,6 +21,16 @@ let section = createSection();
 const main = document.createElement('main');
 main.classList.add('main');
 body.insertBefore(main, document.querySelector('script'));
+
+// добавление подсказки с листами
+const addTooltip = function addPageNumberTolltip() {
+  const tooltipBlock = createDiv();
+  tooltipBlock.classList.add('tooltip');
+  tooltipBlock.innerHTML = '<span>#</span>';
+  body.insertBefore(tooltipBlock, body.firstChild);
+};
+addTooltip();
+const tooltipBlock = document.querySelector('.tooltip');
 
 // добавление строки поиска
 const addSearchForm = () => {
@@ -35,7 +47,7 @@ const inputRequest = document.querySelector('.query');
 
 // определение количества видео на странице
 const defineVideoCount = () => {
-  const displayWidth = window.visualViewport.width;
+  const displayWidth = window.innerWidth;
   let resultIndex = 0;
   for (let i = 0; i < resolutions.length; i += 1) {
     if (displayWidth >= resolutions[i]) {
@@ -54,12 +66,13 @@ const defineVideoCount = () => {
 const createContainer = function createContainerForBlockVideo() {
   section = createSection();
   section.classList.add('video-list');
-  main.appendChild(section);
+  main.insertBefore(section, document.querySelector('.pagination'));
 };
 
 // запрос статистики по конкретному видео
 const getStatisticsVideo = function getStatisticByVideoIdFromYoutube(id) {
   return new Promise((resolve) => {
+    // eslint-disable-next-line no-undef
     const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function reqest() {
       if (xhr.readyState === 4 && xhr.status === 200) {
@@ -86,6 +99,7 @@ const getListStatisticsVideo = function getStatisticAllVideoFromYoutube(list) {
 
 // получение первого листа
 const getFirstYoutubePage = function getListVideoFromYoutube(resolve) {
+  // eslint-disable-next-line no-undef
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function request() {
     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -166,31 +180,12 @@ const refreshContainer = function refreshVideoContainer() {
   createContainer();
 };
 
-// нажатие на кнопку поиска
-const searchButton = document.querySelector('.search');
-searchButton.addEventListener('click', (e) => {
-  e.preventDefault();
-  offsetPage = 0;
-  listVideo.length = 0;
-  refreshContainer();
-  addContentOnPage();
-});
-
-// изменение кол-ва блоков видео от ширины брузера
-const changeNumberVideoBlock = function changeNumberVideoBlockOnPage() {
-  const tempCur = currentAmountVideoOnPage;
-  const newAmountVideoOnPage = defineVideoCount();
-  const dif = newAmountVideoOnPage - tempCur;
-  if (dif <= 0) {
-    for (let i = 0, len = Math.abs(dif); i < len; i += 1) section.lastChild.remove();
-  } else {
-    for (let i = 0; i < dif; i += 1) {
-      section.appendChild(createBlockVideo());
-      addContentInBlock(listVideo[tempCur + offsetPage + i], tempCur + i);
-    }
-  }
+// подсчёт листов
+const calcNumberPage = function calcNumberCurrentPage() {
+  numberCurrentPage = offsetPage / currentAmountVideoOnPage + 1;
+  document.querySelector('.tooltip span').innerText = numberCurrentPage;
+  document.querySelector('.page-number').innerText = numberCurrentPage;
 };
-window.addEventListener('resize', changeNumberVideoBlock);
 
 // создание блоков и заполнение контентом при листании страниц
 const fillPrevNextPage = function addBlocksAndContentPrevNextPage() {
@@ -200,8 +195,38 @@ const fillPrevNextPage = function addBlocksAndContentPrevNextPage() {
   }
 };
 
+// изменение кол-ва блоков видео от ширины брузера
+const changeNumberVideoBlock = function changeNumberVideoBlockOnPage() {
+  const tempCurrent = currentAmountVideoOnPage;
+  const newAmountVideoOnPage = defineVideoCount();
+  const diff = newAmountVideoOnPage - tempCurrent;
+  if (diff < 0) {
+    if (offsetPage === 0) {
+      refreshContainer();
+      fillPrevNextPage();
+    } else {
+      refreshContainer();
+      offsetPage -= 1;
+      fillPrevNextPage();
+    }
+  }
+  if (diff > 0) {
+    if (offsetPage === 0) {
+      refreshContainer();
+      fillPrevNextPage();
+    } else {
+      refreshContainer();
+      offsetPage += 1;
+      fillPrevNextPage();
+    }
+  }
+  calcNumberPage();
+};
+window.addEventListener('resize', changeNumberVideoBlock);
+
 // следующая страница ютуба
 const addNextYoutubePage = function getAndAddNextYoutubePage(resolve) {
+  // eslint-disable-next-line no-undef
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function reqest() {
     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -217,51 +242,89 @@ const addNextYoutubePage = function getAndAddNextYoutubePage(resolve) {
 
 // следующая страница из кэша
 const nextPage = function getNextPage() {
+  if (listVideo.length === 0) {
+    return;
+  }
   const remaringPages = listVideo.length - offsetPage - currentAmountVideoOnPage;
-  if (remaringPages < currentAmountVideoOnPage * bufferPagesIndex) {
+  if (remaringPages < currentAmountVideoOnPage * bufferPreloadPagesIndex) {
     getContetntFromYoutube(addNextYoutubePage);
   }
-  refreshContainer();
-  offsetPage += currentAmountVideoOnPage;
-  fillPrevNextPage();
+  videoContainer().classList.add('-swipe-left');
+  setTimeout(() => {
+    refreshContainer();
+    offsetPage += currentAmountVideoOnPage;
+    fillPrevNextPage();
+    calcNumberPage();
+  }, timeSwipeAnimation);
 };
 
 // предыдущая страница из кэша
 const prevPage = function getPrevPage() {
-  refreshContainer();
-  offsetPage -= currentAmountVideoOnPage;
-  fillPrevNextPage();
+  if (offsetPage <= 0) {
+    return;
+  }
+  videoContainer().classList.add('-swipe-right');
+  setTimeout(() => {
+    refreshContainer();
+    offsetPage -= currentAmountVideoOnPage;
+    fillPrevNextPage();
+    calcNumberPage();
+  }, timeSwipeAnimation);
 };
+
+// добавление блока управления страницами
+const addPaginationBlock = function addPaginationBlock() {
+  if (document.querySelector('.pagination')) {
+    return;
+  }
+  const pagination = createSection();
+  pagination.classList.add('pagination');
+  pagination.innerHTML = `<div class="prev">&laquo;</div>
+    <div class="page-number">#</div>
+    <div class="next">&raquo;</div>
+    `;
+  main.appendChild(pagination);
+  document.querySelector('.next').addEventListener('click', nextPage);
+  document.querySelector('.prev').addEventListener('click', prevPage);
+};
+
+// нажатие на кнопку поиска
+const searchButton = document.querySelector('.search');
+searchButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  offsetPage = 0;
+  listVideo.length = 0;
+  refreshContainer();
+  addContentOnPage();
+  addPaginationBlock();
+  calcNumberPage();
+});
 
 // действие при отпускании тача или мыши
 let xDown = null;
+let yDown = null;
 const actionEnd = function mouseOrTouchEndAction(e) {
   if (document.getSelection().toString().length > 0) {
     return;
   }
+
   let xUp = null;
   if (e.type === 'mouseup') {
     xUp = e.clientX;
   } else if (e.type === 'touchend') {
     xUp = e.changedTouches[0].clientX;
   }
+
   const xDiff = xDown - xUp;
   if (Math.abs(xDiff) > minLengthForSwipe) {
     if (xDiff < 0) {
-      if (offsetPage <= 0) {
-        return;
-      }
-      videoContainer().classList.add('-swipe-right');
-      setTimeout(prevPage, 500);
+      prevPage();
     } else {
-      if (listVideo.length === 0) {
-        return;
-      }
-      videoContainer().classList.add('-swipe-left');
-      setTimeout(nextPage, 500);
+      nextPage();
     }
   }
   xDown = null;
+  yDown = null;
 };
 
 // события по тач свайпу
@@ -273,10 +336,19 @@ main.addEventListener('touchend', actionEnd);
 // события по мышь свайпу
 main.addEventListener('mousedown', (e) => {
   xDown = e.clientX;
+  yDown = e.clientY;
+  tooltipBlock.style.top = `${yDown}px`;
+  tooltipBlock.style.left = `${xDown}px`;
+  tooltipBlock.classList.add('-visible');
 });
-main.addEventListener('mouseup', actionEnd);
+main.addEventListener('mouseup', (e) => {
+  tooltipBlock.classList.remove('-visible');
+  tooltipBlock.style.top = '0';
+  tooltipBlock.style.left = '0';
+  actionEnd(e);
+});
 
-// события по нажатию на стрелки
+// события по нажатию на стрелки на клавиатуре
 window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') {
     prevPage();
