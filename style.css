@@ -160,7 +160,7 @@ body {
 
 /* == MEDIA == */
 
-@media screen and (max-width: 1366vw) {
+@media screen and (max-width: 1366px) {
   .header {
     margin-top: 5em;
   }
@@ -170,7 +170,7 @@ body {
   }
 }
 
-@media screen and (max-width: 960vw) {
+@media screen and (max-width: 960px) {
   .header {
     margin-top: 2em;
   }
@@ -181,7 +181,7 @@ body {
   }
 }
 
-@media screen and (max-width: 600vw) {
+@media screen and (max-width: 600px) {
   .header {
     margin-top: 5em;
   }

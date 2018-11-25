@@ -35,15 +35,15 @@ const inputRequest = document.querySelector('.query');
 
 // определение количества видео на странице
 const defineVideoCount = () => {
-  const width = window.innerWidth;
+  const displayWidth = window.visualViewport.width;
   let resultIndex = 0;
   for (let i = 0; i < resolutions.length; i += 1) {
-    if (width >= resolutions[i]) {
+    if (displayWidth >= resolutions[i]) {
       resultIndex = i;
       break;
     }
   }
-  if (resultIndex > 0 && width !== resolutions[resultIndex]) {
+  if (resultIndex > 0 && displayWidth !== resolutions[resultIndex]) {
     resultIndex -= 1;
   }
   currentAmountVideoOnPage = videoOnPageVariants[resultIndex];
