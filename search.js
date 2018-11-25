@@ -217,9 +217,6 @@ const addNextYoutubePage = function getAndAddNextYoutubePage(resolve) {
 
 // следующая страница из кэша
 const nextPage = function getNextPage() {
-  if (listVideo.length === 0) {
-    return;
-  }
   const remaringPages = listVideo.length - offsetPage - currentAmountVideoOnPage;
   if (remaringPages < currentAmountVideoOnPage * bufferPagesIndex) {
     getContetntFromYoutube(addNextYoutubePage);
@@ -231,9 +228,6 @@ const nextPage = function getNextPage() {
 
 // предыдущая страница из кэша
 const prevPage = function getPrevPage() {
-  if (offsetPage <= 0) {
-    return;
-  }
   refreshContainer();
   offsetPage -= currentAmountVideoOnPage;
   fillPrevNextPage();
@@ -242,6 +236,9 @@ const prevPage = function getPrevPage() {
 // действие при отпускании тача или мыши
 let xDown = null;
 const actionEnd = function mouseOrTouchEndAction(e) {
+  if (document.getSelection().toString().length > 0) {
+    return;
+  }
   let xUp = null;
   if (e.type === 'mouseup') {
     xUp = e.clientX;
@@ -251,9 +248,15 @@ const actionEnd = function mouseOrTouchEndAction(e) {
   const xDiff = xDown - xUp;
   if (Math.abs(xDiff) > minLengthForSwipe) {
     if (xDiff < 0) {
+      if (offsetPage <= 0) {
+        return;
+      }
       videoContainer().classList.add('-swipe-right');
       setTimeout(prevPage, 500);
     } else {
+      if (listVideo.length === 0) {
+        return;
+      }
       videoContainer().classList.add('-swipe-left');
       setTimeout(nextPage, 500);
     }

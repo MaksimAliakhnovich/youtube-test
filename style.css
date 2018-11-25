@@ -1,5 +1,4 @@
 body {
-  overflow: hidden;
   background-color: #f1f1f1;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -56,6 +55,10 @@ body {
 }
 
 /* == VIDEO LIST == */
+.main {
+  overflow: hidden;
+  padding-bottom: 20px;
+}
 
 .main .video-list {
   display: grid;
@@ -140,14 +143,14 @@ body {
   content: "\f039";
 }
 
-/* == VIDEO LIST == */
+/* == ANIMATION == */
 .-swipe-left {
-  transform: translate(-80%);
+  transform: translate(-100%);
   opacity: 0;
 }
 
 .-swipe-right {
-  transform: translate(80%);
+  transform: translate(100%);
   opacity: 0;
 }
 
