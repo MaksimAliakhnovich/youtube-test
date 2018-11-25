@@ -1,4 +1,5 @@
 body {
+  overflow: hidden;
   background-color: #f1f1f1;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -63,6 +64,7 @@ body {
   grid-column-gap: 3%;
   margin: 5em 2em 0;
   justify-content: center;
+  transition: 0.5s;
 }
 
 .main figure {
@@ -95,16 +97,19 @@ body {
 }
 
 .main .description {
-  max-height: 100px;
+  max-height: 115px;
 }
 
 .main .description p {
   margin: 0;
+  max-height: 100px;
+  overflow: auto;
+  word-break: break-all;
 }
 
 .main figure div {
   position: relative;
-  margin: 0 10px 0 50px;
+  margin: 0 25px 0 50px;
   padding: 0.5em 0;
 }
 
@@ -133,6 +138,21 @@ body {
 
 .main .description::before {
   content: "\f039";
+}
+
+/* == VIDEO LIST == */
+.-swipe-left {
+  transform: translate(-80%);
+  opacity: 0;
+}
+
+.-swipe-right {
+  transform: translate(80%);
+  opacity: 0;
+}
+
+.main .-visible {
+  opacity: 1;
 }
 
 /* == MEDIA == */
